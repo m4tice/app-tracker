@@ -20,7 +20,7 @@ class AppTracker:
         self.process_name = None
         self.log_path = "./logs"
         self.csv_file_name = "data.csv"
-        self.columns = ['year', 'month', 'day', 'hour', 'minute', 'second', 'state']
+        self.columns = ['year', 'month', 'day', 'hour', 'minute', 'second', 'process', 'state']
 
         if not os.path.isdir(self.log_path):
             os.makedirs(self.log_path)
@@ -95,6 +95,7 @@ class AppTracker:
                 current_time.hour,
                 current_time.minute,
                 current_time.second,
+                self.process_name,
                 process_state
             ]
 
@@ -117,9 +118,16 @@ def main():
     '''
     main loop
     '''
-    messenger_tracker = AppTracker()
-    messenger_tracker.set_process_name("messenger.exe")
-    messenger_tracker.log_activity()
+
+    processes = [
+        'messenger.exe',
+        'firefox.exe'
+    ]
+
+    for process in processes:
+        process_tracker = AppTracker()
+        process_tracker.set_process_name(process)
+        process_tracker.log_activity()
 
 
 if __name__ == "__main__":
