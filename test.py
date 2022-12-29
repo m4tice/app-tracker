@@ -1,4 +1,3 @@
 '''Test file'''
-import getpass
-
-print(getpass.getuser())
+for i in range(5, 1, -1):
+    print(i)

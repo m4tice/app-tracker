@@ -18,9 +18,10 @@ class AppTracker:
     def __init__(self) -> None:
         self.state = None
         self.process_name = None
+        self.current_user = os.getlogin()
         self.log_path = "./logs"
         self.csv_file_name = "data.csv"
-        self.columns = ['year', 'month', 'day', 'hour', 'minute', 'second', 'process', 'state']
+        self.columns = ['year', 'month', 'day', 'hour', 'minute', 'second', 'process', 'state', 'user']
 
         if not os.path.isdir(self.log_path):
             os.makedirs(self.log_path)
@@ -49,8 +50,15 @@ class AppTracker:
             return None
 
         # Get last row
-        last_update = dataframe.tail(1)
-        last_state = bool(last_update['state'].values[-1])
+        last_state = None
+
+        for i in range(len(dataframe)-1, -1, -1):
+
+            last_update = dataframe.iloc[i]
+
+            if last_update['process'] == self.process_name:
+                last_state = bool(last_update['state'])
+                return last_state
 
         return last_state
 
@@ -85,7 +93,7 @@ class AppTracker:
         last_state = self.get_state_from_csv_file()
 
         if last_state is None or process_state != last_state:
-            print("Logging new data")
+            print(f"{self.process_name}: Logging new data")
             current_time = datetime.now()
 
             content_csv = [
@@ -96,7 +104,8 @@ class AppTracker:
                 current_time.minute,
                 current_time.second,
                 self.process_name,
-                process_state
+                process_state,
+                self.current_user
             ]
 
             try:
@@ -128,6 +137,8 @@ def main():
         process_tracker = AppTracker()
         process_tracker.set_process_name(process)
         process_tracker.log_activity()
+
+        # del process_tracker
 
 
 if __name__ == "__main__":
